@@ -22,11 +22,11 @@ class AROTXT extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginPage(),
-        '/home': (context) => HomePage(),
+        '/': (context) => const LoginPage(),
+        '/home': (context) => const HomePage(),
         '/signup': (context) => SignupPage(),
-        '/about': (context) => AboutPage(),
-        '/feedback': (context) => FeedbackPage(),
+        '/about': (context) => const AboutPage(),
+        '/feedback': (context) => const FeedbackPage(),
       },
     );
   }

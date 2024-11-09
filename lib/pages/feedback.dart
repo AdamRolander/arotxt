@@ -7,9 +7,9 @@ class FeedbackPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return  Scaffold(
       appBar: AppBar(
-        title: Text("Feedback Center"),
+        title: const Text("Feedback Center"),
       ),
-      body: Center(
+      body: const Center(
         child: Text("This is the Feedback section."),
       ),
     );

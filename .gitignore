@@ -1,0 +1,75 @@
+# Flutter/Dart related
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+build/
+android/.gradle/
+pubspec.lock
+
+# Android related
+**/android/captures/
+**/android/gradle-wrapper.jar
+**/android/app/debug/
+**/android/app/release/
+**/android/local.properties
+**/android/.idea/
+**/android/.settings/
+**/android/app.keystore
+
+# iOS related
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/.symlinks/
+ios/Pods/
+ios/.generated/
+ios/Flutter/App.framework
+ios/Flutter/Debug.xcconfig
+ios/Flutter/Release.xcconfig
+
+# macOS related
+macos/Flutter/ephemeral/
+macos/.symlinks/
+macos/Pods/
+macos/Flutter/Flutter.podspec
+macos/Flutter/Generated.xcconfig
+macos/Flutter/App.framework
+macos/Flutter/Debug.xcconfig
+macos/Flutter/Release.xcconfig
+
+# Linux related
+linux/flutter/ephemeral/
+
+# Windows related
+windows/flutter/ephemeral/
+
+# Web related
+web/.dart_tool/
+
+# JetBrains IDEs
+.idea/
+*.iml
+
+# VS Code settings
+.vscode/
+
+# Generated Firebase settings
+firebase_app_id_file.json
+
+# Miscellaneous
+.DS_Store
+*.log
+*.lock
+*.pyc
+*.swp
+
+# IntelliJ related files
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Obsolete .flutter-plugins-dependencies file
+.flutter-plugins-dependencies
