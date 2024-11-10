@@ -1,60 +1,72 @@
+import 'dart:io'; // for file handling
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart'; // for image selection, gallery + camera
 import '../widgets/burger.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
+// set state triggers a ui update!
+
 class _HomePageState extends State<HomePage> {
-  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+  List<XFile>? _selectedImages = []; // ? = nullable list of images
 
-  // Function to pick an image from the gallery
-  Future<void> _pickImageFromGallery() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+  // Function to pick multiple images from the gallery
+  Future<void> _pickMultipleImages() async {
+    final List<XFile>? images = await _picker.pickMultiImage(); // enables multi selection 
+    if (images != null) {
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _selectedImages!.addAll(images); // ! = null assertion operator, telling it we know it won't be null when doing this 
       });
     }
   }
 
-  // Function to take a photo using the camera
+  // Function to take a photo with the camera
   Future<void> _takePhoto() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
+    final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+    if (photo != null) {
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _selectedImages!.add(photo);
       });
     }
   }
 
-  // Show dialog to pick image source
-  void _showImageSourceActionSheet(BuildContext context) {
-    showModalBottomSheet(
+  // Function to remove an image
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages!.removeAt(index);
+    });
+  }
+
+  // Function to show a dialog with options for camera or gallery
+  void _showImageSourceSelectionDialog(BuildContext context) {
+    showDialog(
       context: context,
       builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: <Widget>[
+        return AlertDialog(
+          title: const Text("Select Image Source"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Choose from Gallery'),
+                leading: const Icon(Icons.camera_alt),
+                title: const Text("Camera"),
                 onTap: () {
-                  _pickImageFromGallery();
-                  Navigator.of(context).pop();
+                  Navigator.pop(context); // Close the dialog
+                  _takePhoto(); // Launch camera
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Take a Photo'),
+                leading: const Icon(Icons.photo_library),
+                title: const Text("Gallery"),
                 onTap: () {
-                  _takePhoto();
-                  Navigator.of(context).pop();
+                  Navigator.pop(context); // Close the dialog
+                  _pickMultipleImages(); // Launch gallery
                 },
               ),
             ],
@@ -68,28 +80,92 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Placeholder(),
-        ),
         title: const Text('AROTXT Home'),
-      ),
-      endDrawer: const Burger(),
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _selectedImage == null
-                  ? const Text('No image selected.', style: TextStyle(fontSize: 24))
-                  : Image.file(_selectedImage!), // Display the selected image
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () => _showImageSourceActionSheet(context),
-                child: const Text('Add Image'),
-              ),
-            ],
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu), // Burger menu
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
+        ],
+      ),
+      endDrawer: const Burger(), // Burger menu from custom widget
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            // Making the page scrollable and displaying selected images
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _selectedImages != null && _selectedImages!.isNotEmpty
+                        ? GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(), // Prevent GridView from scrolling
+                            shrinkWrap: true, // Let the GridView take up as much space as needed
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2, // Adjust the number of images per row
+                            ),
+                            itemCount: _selectedImages!.length,
+                            itemBuilder: (context, index) {
+                              return Stack(
+                                children: [
+                                  // Display each image
+                                  Positioned.fill(
+                                    child: Image.file(
+                                      File(_selectedImages![index].path),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  // X button to remove the image
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close, color: Colors.red),
+                                      onPressed: () {
+                                        _removeImage(index);
+                                      },
+                                    ),
+                                  ),
+                                  // Numbering in the other corner
+                                  Positioned(
+                                    left: 0,
+                                    top: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      color: Colors.black54,
+                                      child: Text(
+                                        '${index + 1}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          )
+                        : const Center(
+                            child: Text('No images selected'),
+                          ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Button at the bottom of the screen for selecting image source
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () => _showImageSourceSelectionDialog(context),
+                child: const Text("Select Images"),
+              ),
+            ),
+          ],
         ),
       ),
     );
