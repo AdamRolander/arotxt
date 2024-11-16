@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart'; // for image selection, gallery
 import '../widgets/burger.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -14,24 +14,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ImagePicker _picker = ImagePicker();
-  List<XFile>? _selectedImages = []; // ? = nullable list of images
+  final List<XFile> _selectedImages = []; // ? = nullable list of images
 
   // Function to pick multiple images from the gallery
   Future<void> _pickMultipleImages() async {
-    final List<XFile>? images = await _picker.pickMultiImage(); // enables multi selection 
-    if (images != null) {
-      setState(() {
-        _selectedImages!.addAll(images); // ! = null assertion operator, telling it we know it won't be null when doing this 
-      });
+    final List<XFile> images = await _picker.pickMultiImage(); // enables multi selection 
+    setState(() {
+      _selectedImages.addAll(images); // ! = null assertion operator, telling it we know it won't be null when doing this 
+    });
     }
-  }
 
   // Function to take a photo with the camera
   Future<void> _takePhoto() async {
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       setState(() {
-        _selectedImages!.add(photo);
+        _selectedImages.add(photo);
       });
     }
   }
@@ -39,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   // Function to remove an image
   void _removeImage(int index) {
     setState(() {
-      _selectedImages!.removeAt(index);
+      _selectedImages.removeAt(index);
     });
   }
 
@@ -100,21 +98,21 @@ class _HomePageState extends State<HomePage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _selectedImages != null && _selectedImages!.isNotEmpty
+                    _selectedImages.isNotEmpty
                         ? GridView.builder(
                             physics: const NeverScrollableScrollPhysics(), // Prevent GridView from scrolling
                             shrinkWrap: true, // Let the GridView take up as much space as needed
                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2, // Adjust the number of images per row
                             ),
-                            itemCount: _selectedImages!.length,
+                            itemCount: _selectedImages.length,
                             itemBuilder: (context, index) {
                               return Stack(
                                 children: [
                                   // Display each image
                                   Positioned.fill(
                                     child: Image.file(
-                                      File(_selectedImages![index].path),
+                                      File(_selectedImages[index].path),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
